@@ -2,6 +2,8 @@ package com.etiko;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -29,6 +31,21 @@ public class HomeController {
 	@RequestMapping("prepare")
 	public String prepare(@RequestParam("clientNumber") String clientNumber, @RequestParam("labelNumber") String labelNumber, Model m) throws IOException {
 
+		String hostname = "Unknown";
+
+		try
+		{
+		    InetAddress addr;
+		    addr = InetAddress.getLocalHost();
+		    hostname = addr.getHostName();
+		   // System.out.println(hostname);
+		}
+		catch (UnknownHostException ex)
+		{
+		    System.out.println("Hostname can not be resolved");
+		}
+		
+		
 		String group = "";
 
 		//add client subgroup to the read path
@@ -60,14 +77,14 @@ public class HomeController {
 			}
 		}
 		
-		String copiedDirectory = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber;
-		String copiedDirectoryOld = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD";
+		String copiedDirectory = "\\\\"+hostname+"\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber;
+		String copiedDirectoryOld = "\\\\"+hostname+"\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD";
 		String pattern = ".*\\\\";
 		String inputPath = "\\\\ARCHIWUM\\Archiwum_Etiko\\Archiwum Projektów Etiko\\"+group+"\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber;
 		String inputOldPath = "\\\\ARCHIWUM\\Archiwum_Etiko\\Archiwum Projektów Etiko\\"+group+"\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD";
 		
-		String outputPath = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\";
-		String outputOldPath = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD\\";
+		String outputPath = "\\\\"+hostname+"\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\";
+		String outputOldPath = "\\\\"+hostname+"\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD\\";
 		
 		File[] directoryContent = (new File(inputPath)).listFiles();
 		
