@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,19 +28,22 @@ public class HomeController {
 	@RequestMapping("prepare")
 	public String prepare(Model m) throws IOException {
 		
-		InputStream inStream = null;
-	    OutputStream outStream = null;
+//		InputStream inStream = null;
+//	    OutputStream outStream = null;
 
 		String pattern = ".*\\\\";
 		String inputPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ARCH\\0\\0001\\0001-300";
-		String outputPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ROBO\\0001\\0001-300";
+		String outputPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ROBO\\0001\\0001-300\\";
 		File[] directoryContent = (new File(inputPath)).listFiles();
 		String[] filenames = new String[directoryContent.length];
-		String[] abc = new String[directoryContent.length];
+		File [] abc = new File[directoryContent.length];
 		for (int a = 0; a<directoryContent.length; a++) {
 			filenames[a] = 	directoryContent[a].toString();
 			filenames[a] = filenames[a].replaceAll(pattern, "");
+			abc[a]= new File(outputPath+filenames[a]);
+			Files.copy(directoryContent[a].toPath(), abc[a].toPath(), StandardCopyOption.REPLACE_EXISTING);
 		}
+		
 		
 //		new File(outputPath).mkdir();//creates directory
 //		for (int b = 0; b<directoryContent.length; b++) {
