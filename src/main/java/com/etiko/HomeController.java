@@ -14,13 +14,12 @@ import java.text.SimpleDateFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 
 @Controller
 public class HomeController {
-	
-	Project project = new Project();
 
 	@RequestMapping("/")
 	public String load() {
@@ -28,27 +27,55 @@ public class HomeController {
 	}
 	
 	@RequestMapping("prepare")
-	public String prepare(Model m) throws IOException {
-		
-//		InputStream inStream = null;
-//	    OutputStream outStream = null;
+	public String prepare(@RequestParam("clientNumber") String clientNumber, @RequestParam("labelNumber") String labelNumber, Model m) throws IOException {
 
-		String directory = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ROBO\\0001\\0001-300";
-		String pattern = ".*\\\\";
-		String inputPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ARCH\\0\\0001\\0001-300";
-		String inputOldPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ARCH\\0\\0001\\0001-300\\OLD";
+		String group = "";
+
+		//add client subgroup to the read path
+		if (clientNumber.length()<3) {
+			group = "0";
+		}
+		else if (clientNumber.length()<4) {
+			group = String.valueOf(clientNumber.charAt(0));
+		}
+		else {
+			String n1 = String.valueOf(clientNumber.charAt(0));
+			String n2 = String.valueOf(clientNumber.charAt(1));
+			group = n1+n2;
+		}
 		
-		String outputPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ROBO\\0001\\0001-300\\";
-		String outputOldPath = "F:\\POMOCE NOWE\\PROGRAMOWANIE_JAVA\\SPRING\\CPP\\ROBO\\0001\\0001-300\\OLD\\";
+		
+		//add zero before the client number to have 4 digit number
+		if (clientNumber.length()<4) {
+			for (int x = clientNumber.length(); x<4; x++) {
+				clientNumber = "0"+clientNumber;
+			}
+		}
+		
+		
+		//add zero before the label number to have 3 digit number
+		if (labelNumber.length()<4) {
+			for (int x = labelNumber.length(); x<3; x++) {
+				labelNumber = "0"+labelNumber;
+			}
+		}
+		
+		String copiedDirectory = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber;
+		String copiedDirectoryOld = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD";
+		String pattern = ".*\\\\";
+		String inputPath = "\\\\ARCHIWUM\\Archiwum_Etiko\\Archiwum Projektów Etiko\\"+group+"\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber;
+		String inputOldPath = "\\\\ARCHIWUM\\Archiwum_Etiko\\Archiwum Projektów Etiko\\"+group+"\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD";
+		
+		String outputPath = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\";
+		String outputOldPath = "\\\\Grafik-slawek\\roboczy\\ETYKIETY\\"+clientNumber+"\\"+clientNumber+"-"+labelNumber+"\\OLD\\";
 		
 		File[] directoryContent = (new File(inputPath)).listFiles();
-		File[] directoryOldContent = (new File(inputOldPath)).listFiles();
+		
 		
 		String[] filenames = new String[directoryContent.length];
 		File[] copiedFiles = new File[directoryContent.length];
 		
-		String[] filenamesOld = new String[directoryOldContent.length];
-		File[] copiedFilesOld = new File[directoryOldContent.length];
+	
 				
 		 FileTime moddate = null;
 		 DateFormat df = new SimpleDateFormat("yyyyMMdd");
@@ -57,14 +84,19 @@ public class HomeController {
 		 String newname = "";
 		 
 		 
-		new File(directory).mkdir();//creates directory
+		new File(copiedDirectory).mkdir();//creates directory
+		new File(copiedDirectoryOld).mkdir();//creates directory
+		
 		for (int a = 0; a<directoryContent.length; a++) {
-			filenames[a] = 	directoryContent[a].toString();
-			filenames[a] = filenames[a].replaceAll(pattern, "");
+			filenames[a] = 	directoryContent[a].toString(); //generates file names
+			filenames[a] = filenames[a].replaceAll(pattern, ""); //generates file names
 			copiedFiles[a]= new File(outputPath+filenames[a]);
 			Files.copy(directoryContent[a].toPath(), copiedFiles[a].toPath(), StandardCopyOption.REPLACE_EXISTING);
 			
 			if (filenames[a].equals("OLD")) {
+				File[] directoryOldContent = (new File(inputOldPath)).listFiles();
+				String[] filenamesOld = new String[directoryOldContent.length];
+				File[] copiedFilesOld = new File[directoryOldContent.length];
 				for (int b = 0; b<directoryOldContent.length; b++) {
 					filenamesOld[b] = 	directoryOldContent[b].toString();
 					filenamesOld[b] = filenamesOld[b].replaceAll(pattern, "");
@@ -77,6 +109,8 @@ public class HomeController {
 			}
 		
 		}
+		
+		
 		for (int c = 0; c<directoryContent.length; c++) {
 			if (filenames[c].matches(".*.metryka") ) { //zapisuje metryke z nowa nazwa w oldzie i kasuje w katalogu glownym
 				
@@ -119,36 +153,8 @@ if (filenames[c].matches(".*tmpgrs") ) { // kasuje tmpgrs w katalogu glownym
 }
 			
 		}
-		
-		
-		
-//		new File(outputPath).mkdir();//creates directory
-//		for (int b = 0; b<directoryContent.length; b++) {
-//			
-//		File inp = new File(directoryContent[b].toString());
-//		File out = new File(outputPath+"\\"+abc[b]);
-//		
-//		inStream = new FileInputStream(inp);
-//        outStream = new FileOutputStream(out);
-//
-//        byte[] buffer = new byte[1024];
-//
-//        int length;
-//		
-//        while ((length = inStream.read(buffer)) > 0){  //copy the file content in bytes
-//
-//            outStream.write(buffer, 0, length);
-//
-//        }
-//
-//        inStream.close();
-//        outStream.close();
-//		}
-		
-		//directoryContent[2].createNewFile();
-		
-		m.addAttribute("result", newname);
-		
+
+		m.addAttribute("result", labelNumber);
 		return "result.jsp";
 	}
 
